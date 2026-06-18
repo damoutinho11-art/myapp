@@ -63,6 +63,20 @@
   .note-box{padding:14px; border-radius:10px; font-size:12px; line-height:1.7; color:#aaa;}
   .check-item{display:flex; align-items:center; gap:12px; padding:13px; background:var(--card); border-radius:9px; border:1px solid var(--border); margin-bottom:6px;}
   .install-banner{display:none; position:fixed; bottom:0; left:0; right:0; background:var(--g); color:#000; padding:12px 16px; font-family:'Courier New',monospace; font-size:12px; font-weight:700; text-align:center; cursor:pointer; z-index:999;}
+  .meal-card{background:var(--card); border-radius:10px; border:1px solid var(--border); margin-bottom:7px; overflow:hidden;}
+  .meal-head{display:flex; align-items:center; gap:10px; padding:13px 15px; cursor:pointer;}
+  .meal-time{font-family:'Courier New',monospace; font-size:9px; margin-bottom:2px;}
+  .meal-name{font-size:14px; font-weight:700;}
+  .meal-macros{display:flex; gap:8px; align-items:center;}
+  .meal-macro{font-family:'Courier New',monospace; font-size:10px; text-align:center;}
+  .meal-macro .v{font-weight:700;}
+  .meal-macro .l{color:var(--muted); font-size:8px;}
+  .meal-body{padding:0 15px 14px; border-top:1px solid var(--border); display:none;}
+  .meal-body.open{display:block;}
+  .meal-item{font-size:13px; color:#ccc; padding:7px 0; border-bottom:1px solid var(--border);}
+  .meal-item:last-child{border-bottom:none;}
+  .meal-tip{padding:10px; border-radius:8px; font-size:12px; color:#aaa; line-height:1.6; margin-top:10px;}
+  .cardio-card{background:#0a0a0a; border-radius:10px; border:1px solid rgba(255,221,0,.18); margin-bottom:7px; padding:13px 15px;}
 </style>
 </head>
 <body>
@@ -93,6 +107,7 @@
 
 <div class="panel active" id="panel-today"></div>
 <div class="panel" id="panel-training"></div>
+<div class="panel" id="panel-meals"></div>
 <div class="panel" id="panel-fuel"></div>
 <div class="panel" id="panel-mind"></div>
 <div class="panel" id="panel-progress"></div>
@@ -159,11 +174,45 @@ const DEEPWORK = [
   { t: "Analytics Build", d: "Edge Lab, projection models, dashboards — ship something each session." },
 ];
 
+const MEALS = {
+  train: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["30–45 min walk or light jog", "Peptides after cardio — fasted the whole time"], tip: "Do this before anything else. Biggest daily fat burner." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "Tracker-verified. Scramble eggs, mix whey into yogurt, ketchup on eggs." },
+    { time: "12:30", name: "Chicken & Veg Lunch", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup to taste"], tip: "Tracker-verified. Batch cook 3 days at a time." },
+    { time: "15:30", name: "Pre-Workout Tuna", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna (120g each) — 145 kcal", "Ketchup"], tip: "Closes the protein gap. Eat 60 min before training." },
+    { time: "18:30", name: "Post-Workout Chicken & Rice", kcal: 455, p: 43, c: 38, f: 4, items: ["150g chicken breast (cooked) — 196 kcal", "40g rice dry weight — 134 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Your only real carb hit of the day — keep rice to 40g dry." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every single night. Never skip this." },
+  ],
+  rest: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["45 min walk — longer today", "No training so this is your only burn"], tip: "Longer session on rest days." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 363, p: 47, c: 2, f: 18, items: ["4 whole eggs — 236 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "No yogurt on rest days — saves 128 kcal." },
+    { time: "12:00", name: "Chicken & Veg", kcal: 290, p: 37, c: 6, f: 4, items: ["150g chicken breast (cooked) — 196 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Smaller chicken portion today. No rice." },
+    { time: "15:00", name: "Tuna Hit", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna — 145 kcal", "Ketchup"], tip: "Pure protein bridge — kills rest day hunger." },
+    { time: "18:30", name: "Chicken & Veg Dinner", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Biggest meal of your rest day. No rice tonight." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Always. Every night." },
+  ],
+  wrap: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["30–45 min walk or jog"], tip: "Same as every day. Non-negotiable." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey — 119 kcal", "10g ketchup — 8 kcal"], tip: "Same as training day. Full breakfast." },
+    { time: "12:30", name: "Tuna Wrap Lunch", kcal: 383, p: 47, c: 30, f: 8, items: ["2 tins tuna — 145 kcal", "1 protein wrap 80g — 234 kcal", "Ketchup — 4 kcal"], tip: "Wrap replaces rice today. No cheese — too many calories." },
+    { time: "15:30", name: "Pre-Workout: Chicken", kcal: 261, p: 49, c: 4, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "Ketchup"], tip: "No carbs needed — wrap at lunch covered it." },
+    { time: "18:30", name: "Post-Workout Chicken & Veg", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg — 94 kcal", "Ketchup"], tip: "No rice tonight — wrap was your carb hit." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every night. Always." },
+  ],
+};
+const MEAL_TOTALS = {
+  train: { kcal: 1616, p: 204, c: 64, f: 39 },
+  rest: { kcal: 1323, p: 187, c: 21, f: 34 },
+  wrap: { kcal: 1660, p: 227, c: 60, f: 46 },
+};
+
 // ── STATE ─────────────────────────────────────────────────────────────────
 const todayKey = new Date().toISOString().slice(0,10);
 let checkedRules = JSON.parse(localStorage.getItem("rules-"+todayKey) || "{}");
 let openDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Mon=0
 let dayType = "train";
+let mealDayType = "train";
+let openMeals = {};
 let navIndex = 0;
 
 function saveRules(){ localStorage.setItem("rules-"+todayKey, JSON.stringify(checkedRules)); }
@@ -181,7 +230,7 @@ function updateDates(){
 }
 
 // ── NAV ──────────────────────────────────────────────────────────────────
-const NAVS = ["TODAY","TRAINING","FUEL","MIND","PROGRESS"];
+const NAVS = ["TODAY","TRAINING","MEALS","FUEL","MIND","PROGRESS"];
 const navBar = document.getElementById("navBar");
 NAVS.forEach((n,i)=>{
   const btn = document.createElement("button");
@@ -192,7 +241,7 @@ NAVS.forEach((n,i)=>{
 });
 function renderNav(){
   [...navBar.children].forEach((b,i)=>b.classList.toggle("active", i===navIndex));
-  ["today","training","fuel","mind","progress"].forEach((id,i)=>{
+  ["today","training","meals","fuel","mind","progress"].forEach((id,i)=>{
     document.getElementById("panel-"+id).classList.toggle("active", i===navIndex);
   });
 }
@@ -245,6 +294,68 @@ function renderTraining(){
   el.innerHTML = html;
 }
 function setDay(i){ openDay=i; renderTraining(); }
+
+// ── RENDER: MEALS ────────────────────────────────────────────────────────
+function renderMeals(){
+  const el = document.getElementById("panel-meals");
+  const totals = MEAL_TOTALS[mealDayType];
+  const col = mealDayType === "train" ? "var(--o)" : mealDayType === "rest" ? "var(--b)" : "var(--p)";
+  let html = `<div class="toggle-row">
+    <div class="toggle-btn ${mealDayType==='train'?'active':''}" onclick="setMealDay('train')" style="${mealDayType==='train'?'border-color:var(--o);background:rgba(245,166,35,.08);color:var(--o);':''}">🏋️ TRAINING</div>
+    <div class="toggle-btn ${mealDayType==='rest'?'active':''}" onclick="setMealDay('rest')" style="${mealDayType==='rest'?'border-color:var(--b);background:rgba(77,166,255,.08);color:var(--b);':''}">😴 REST</div>
+    <div class="toggle-btn ${mealDayType==='wrap'?'active':''}" onclick="setMealDay('wrap')" style="${mealDayType==='wrap'?'border-color:var(--p);background:rgba(183,148,244,.08);color:var(--p);':''}">🌯 WRAP DAY</div>
+  </div>`;
+  html += `<div class="macro-box">
+    <div class="mono" style="font-size:9px;color:var(--muted);margin-bottom:4px;">DAILY TOTAL</div>
+    <div class="kcal-num" style="color:${col};">${totals.kcal.toLocaleString()}</div>
+    ${bar('PROTEIN', totals.p, 250, 'var(--g)')}
+    ${bar('CARBS', totals.c, 150, 'var(--o)')}
+    ${bar('FAT', totals.f, 80, 'var(--r)')}
+  </div>`;
+  MEALS[mealDayType].forEach((meal, i)=>{
+    if(meal.cardio){
+      html += `<div class="cardio-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:18px;">🏃</span>
+          <div style="flex:1;">
+            <div class="mono" style="font-size:9px;color:var(--y);margin-bottom:1px;">${meal.time}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--y);">${meal.name}</div>
+          </div>
+          <div class="mono" style="font-size:9px;color:var(--y);background:rgba(255,221,0,.1);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,221,0,.25);">FASTED</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">${meal.tip}</div>
+      </div>`;
+      return;
+    }
+    const isOpen = !!openMeals[mealDayType+i];
+    html += `<div class="meal-card" style="border-color:${isOpen?col:'var(--border)'};">
+      <div class="meal-head" onclick="toggleMeal('${mealDayType}',${i})">
+        <div style="flex:1;">
+          <div class="meal-time" style="color:${col};">${meal.time}</div>
+          <div class="meal-name">${meal.name}</div>
+        </div>
+        <div class="meal-macros">
+          <div class="meal-macro"><div class="v" style="color:var(--g);">${meal.p}</div><div class="l">P</div></div>
+          <div class="meal-macro"><div class="v" style="color:var(--o);">${meal.c}</div><div class="l">C</div></div>
+          <div class="meal-macro"><div class="v" style="color:var(--r);">${meal.f}</div><div class="l">F</div></div>
+          <div class="mono" style="font-size:11px;color:${col};font-weight:700;margin-left:4px;">${meal.kcal}</div>
+          <span class="mono" style="font-size:10px;color:var(--muted);">${isOpen?'▲':'▼'}</span>
+        </div>
+      </div>
+      <div class="meal-body ${isOpen?'open':''}">
+        <div style="padding-top:10px;">`;
+    meal.items.forEach((item, j)=>{
+      html += `<div class="meal-item"><span style="color:${col};margin-right:8px;">→</span>${item}</div>`;
+    });
+    html += `</div><div class="meal-tip" style="background:${col.replace('var(','').replace(')','')==='--g'?'rgba(200,245,66,.06)':'rgba(255,255,255,.03)'};border:1px solid var(--border);">${meal.tip}</div>
+      </div>
+    </div>`;
+  });
+  html += `<div class="note-box" style="margin-top:10px;background:rgba(200,245,66,.04);border:1px solid rgba(200,245,66,.2);">Protein target is 200g+ every day. Weigh chicken raw before cooking. Wrap days swap rice for protein wraps — use when rice isn't available or you want variety.</div>`;
+  el.innerHTML = html;
+}
+function setMealDay(t){ mealDayType=t; renderMeals(); }
+function toggleMeal(type, i){ const k=type+i; openMeals[k] = !openMeals[k]; renderMeals(); }
 
 // ── RENDER: FUEL ─────────────────────────────────────────────────────────
 function renderFuel(){
@@ -339,7 +450,7 @@ function renderProgress(){
 }
 
 function renderAll(){
-  renderToday(); renderTraining(); renderFuel(); renderMind(); renderProgress();
+  renderToday(); renderTraining(); renderMeals(); renderFuel(); renderMind(); renderProgress();
 }
 updateDates();
 renderAll();
