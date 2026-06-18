@@ -1,5 +1,5 @@
-const CACHE_NAME = "breakthrough-v2";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
+const CACHE_NAME = "breakthrough-v3";
+const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192_2.png", "./icon-512_2.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
