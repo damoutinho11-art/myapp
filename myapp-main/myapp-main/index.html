@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#070707" />
+<title>Breakthrough 65 — Rim Protocol</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<style>
+  :root{
+    --bg:#070707; --card:#111111; --border:#1d1d1d;
+    --text:#e5e5de; --muted:#4a4a44;
+    --g:#c8f542; --o:#f5a623; --r:#ff5050; --b:#4da6ff; --p:#b794f4; --y:#ffdd00;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; 
+    background:var(--bg); 
+    color:var(--text); 
+    font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    height:100vh; 
+    display:flex; 
+    flex-direction:column; 
+    overflow:hidden;
+  }
+  .mono{font-family:'Courier New',monospace;}
+  .header{background:#090909; border-bottom:1px solid var(--border); padding:22px 18px 18px; flex-shrink:0;}
+  .eyebrow{font-family:'Courier New',monospace; font-size:9px; color:var(--muted); letter-spacing:.35em; margin-bottom:6px;}
+  .title{font-family:'Courier New',monospace; font-weight:900; font-size:28px; color:var(--g); letter-spacing:-1px; margin-bottom:4px;}
+  .subtitle{font-family:'Courier New',monospace; font-size:10px; color:var(--muted); margin-bottom:12px;}
+  .stat-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .stat{border-radius:8px; padding:8px 14px;}
+  .stat .num{font-family:'Courier New',monospace; font-size:20px; font-weight:900;}
+  .stat .lbl{font-family:'Courier New',monospace; font-size:8px; color:var(--muted);}
+  .nav{display:flex; background:#090909; border-bottom:1px solid var(--border); overflow-x:auto; flex-shrink:0;}
+  .nav button{flex:1; padding:13px 8px; border:none; background:transparent; font-family:'Courier New',monospace; font-size:9px; letter-spacing:.12em; color:var(--muted); border-bottom:2px solid transparent; cursor:pointer; white-space:nowrap;}
+  .nav button.active{color:var(--g); border-bottom-color:var(--g);}
+  
+  .panel-container{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:40px;}
+  .panel{padding:15px; display:none;}
+  .panel.active{display:block;}
+  
+  .card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px;}
+  .rule-row{display:flex; align-items:center; gap:12px; padding:14px 15px; background:var(--card); border-radius:10px; border:1px solid var(--border); margin-bottom:7px; cursor:pointer; transition:opacity .2s;}
+  .rule-row.done{opacity:.5; background:#0a0a0a;}
+  .checkbox{width:22px; height:22px; border-radius:5px; border:2px solid #333; flex-shrink:0; display:flex; align-items:center; justify-content:center;}
+  .checkbox.done{background:var(--g); border-color:var(--g);}
+  .checkbox.done::after{content:"✓"; color:#000; font-size:13px; font-weight:900;}
+  .rule-title{font-size:14px; font-weight:700;}
+  .rule-title.strike{text-decoration:line-through;}
+  .rule-sub{font-size:11px; color:var(--muted); margin-top:2px;}
+  .progress-bar{flex:1; height:5px; background:#1c1c1c; border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--g); border-radius:3px; transition:width .3s;}
+  .day-tabs{display:flex; gap:4px; margin-bottom:14px; overflow-x:auto;}
+  .day-tab{flex-shrink:0; padding:8px 12px; border:2px solid var(--border); background:var(--card); color:var(--muted); border-radius:8px; cursor:pointer; font-family:'Courier New',monospace; font-size:10px; font-weight:700;}
+  .day-tab.active{border-color:var(--g); background:rgba(200,245,66,.08); color:var(--g);}
+  .session-block{padding:16px; background:var(--card); border-radius:12px; border:1px solid var(--border); margin-bottom:10px;}
+  .session-label{font-family:'Courier New',monospace; font-size:10px; letter-spacing:.15em; margin-bottom:10px;}
+  .ex-row{font-size:13px; color:#ccc; padding:7px 0; border-bottom:1px solid var(--border);}
+  .ex-row:last-child{border-bottom:none;}
+  .toggle-row{display:flex; gap:6px; margin-bottom:14px;}
+  .toggle-btn{flex:1; padding:10px 4px; border:2px solid var(--border); background:transparent; color:var(--muted); border-radius:8px; cursor:pointer; font-family:'Courier New',monospace; font-size:10px; font-weight:700;}
+  .toggle-btn.active{border-color:var(--o); background:rgba(245,166,35,.08); color:var(--o);}
+  .macro-box{padding:15px; background:var(--card); border-radius:10px; border:1px solid var(--border); margin-bottom:16px;}
+  .kcal-num{font-family:'Courier New',monospace; font-size:32px; font-weight:900; color:var(--o); line-height:1; margin-bottom:12px;}
+  .bar-label{display:flex; justify-content:space-between; margin-bottom:3px;}
+  .bar-label span:first-child{font-family:'Courier New',monospace; font-size:9px; color:var(--muted); letter-spacing:.15em;}
+  .bar-track{height:3px; background:#1c1c1c; border-radius:2px; margin-bottom:8px;}
+  .bar-fill{height:3px; border-radius:2px;}
+  .pill{padding:6px 12px; border-radius:20px; font-size:12px; display:inline-block; margin:3px;}
+  .pep-row{display:flex; justify-content:space-between; align-items:center; padding:11px 14px; background:var(--card); border-radius:9px; border:1px solid var(--border); margin-bottom:5px;}
+  .item-card{padding:13px; background:var(--card); border-radius:9px; border:1px solid var(--border); margin-bottom:6px;}
+  .section-head{font-family:'Courier New',monospace; font-size:9px; color:var(--muted); letter-spacing:.2em; margin:0 0 10px;}
+  .note-box{padding:14px; border-radius:10px; font-size:12px; line-height:1.7; color:#aaa;}
+  .check-item{display:flex; align-items:center; gap:12px; padding:13px; background:var(--card); border-radius:9px; border:1px solid var(--border); margin-bottom:6px;}
+  .install-banner{display:none; position:fixed; bottom:0; left:0; right:0; background:var(--g); color:#000; padding:12px 16px; font-family:'Courier New',monospace; font-size:12px; font-weight:700; text-align:center; cursor:pointer; z-index:999;}
+  .meal-card{background:var(--card); border-radius:10px; border:1px solid var(--border); margin-bottom:7px; overflow:hidden;}
+  .meal-head{display:flex; align-items:center; gap:10px; padding:13px 15px; cursor:pointer;}
+  .meal-time{font-family:'Courier New',monospace; font-size:9px; margin-bottom:2px;}
+  .meal-name{font-size:14px; font-weight:700;}
+  .meal-macros{display:flex; gap:8px; align-items:center;}
+  .meal-macro{font-family:'Courier New',monospace; font-size:10px; text-align:center;}
+  .meal-macro .v{font-weight:700;}
+  .meal-macro .l{color:var(--muted); font-size:8px;}
+  .meal-body{padding:0 15px 14px; border-top:1px solid var(--border); display:none;}
+  .meal-body.open{display:block;}
+  .meal-item{font-size:13px; color:#ccc; padding:7px 0; border-bottom:1px solid var(--border);}
+  .meal-item:last-child{border-bottom:none;}
+  .meal-tip{padding:10px; border-radius:8px; font-size:12px; color:#aaa; line-height:1.6; margin-top:10px;}
+  .cardio-card{background:#0a0a0a; border-radius:10px; border:1px solid rgba(255,221,0,.18); margin-bottom:7px; padding:13px 15px;}
+</style>
+</head>
+<body>
+
+<div id="installBanner" class="install-banner">📲 Tap to install Breakthrough as an app</div>
+
+<div class="header">
+  <div class="eyebrow">DIOGO MOUTINHO // BASED ON "BREAKTHROUGH 120"</div>
+  <div class="title">BREAKTHROUGH 65</div>
+  <div class="subtitle">Two-a-days. Sharp cut. A mind that's still building.</div>
+  <div class="stat-row">
+    <div class="stat" style="background:rgba(200,245,66,.12); border:1px solid rgba(200,245,66,.3);">
+      <div class="num" id="dayNum" style="color:var(--g);">DAY 1</div>
+      <div class="lbl" id="dayTotal">OF 65</div>
+    </div>
+    <div class="stat" style="background:rgba(255,80,80,.12); border:1px solid rgba(255,80,80,.3);">
+      <div class="num" id="daysToCut" style="color:var(--r);">--</div>
+      <div class="lbl">DAYS TO CUT DEADLINE</div>
+    </div>
+    <div class="stat" style="background:rgba(255,221,0,.12); border:1px solid rgba(255,221,0,.3);">
+      <div class="num" id="daysToDunk" style="color:var(--y);">--</div>
+      <div class="lbl">DAYS TO 🏀 DUNK</div>
+    </div>
+  </div>
+</div>
+
+<div class="nav" id="navBar"></div>
+
+<div class="panel-container">
+  <div class="panel active" id="panel-today"></div>
+  <div class="panel" id="panel-training"></div>
+  <div class="panel" id="panel-meals"></div>
+  <div class="panel" id="panel-fuel"></div>
+  <div class="panel" id="panel-mind"></div>
+  <div class="panel" id="panel-progress"></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const START = new Date("2026-06-17");
+const CUT_END = new Date("2026-07-20");
+const DUNK_TARGET = new Date("2026-08-20");
+const TOTAL_DAYS = Math.round((DUNK_TARGET - START) / 86400000);
+
+const RULES = [
+  { title: "Train twice daily", sub: "4–5x/week two-a-day, 1 full rest day", icon: "🏋️" },
+  { title: "Structured cut nutrition", sub: "Staple foods, protein locked, carbs around training", icon: "🍽️" },
+  { title: "1 hour intentional learning", sub: "Daily — sports science, quant, AI, music", icon: "📚" },
+  { title: "1 hour deep work", sub: "Bassoon repertoire or analytics build — zero distraction", icon: "🎯" },
+  { title: "Start bigger than life and death", sub: "Ground yourself before the grind begins", icon: "🌅" },
+];
+
+const PRELIM = [
+  "Align rehearsal/Opera schedule and gym times — block them in writing",
+  "Set hard boundaries: no overflow between training, practice, and rest",
+  "Control mornings and nights — the only two windows fully yours",
+];
+
+const WEEK = [
+  { d: "MON", am: { t: "PUSH — Strength", e: ["Bench 4×5 @80–85%", "Overhead Press 3×6", "Incline DB Press 3×10"] }, pm: { t: "Plyo — Box & Rim", e: ["Box Jumps 5×5", "Rim Touches 3×5", "Calf Raises 4×8"] } },
+  { d: "TUE", am: { t: "PULL — Strength", e: ["Weighted Pull-Ups 4×5", "Barbell Row 4×6", "Face Pulls 3×15"] }, pm: { t: "Conditioning", e: ["Sprint + Jump 5 reps", "Pogo Jumps 4×15s", "Agility ladder"] } },
+  { d: "WED", am: { t: "LEGS 🔑 — Heavy", e: ["Back Squat 5×5 @80–85%", "RDL 4×6", "Bulgarian Split Squat 3×8 ea"] }, pm: { t: "Plyo 🔑 — Depth & Approach", e: ["Depth Jumps 5×5", "Approach Jumps 10 reps", "Net Grabs / Rim Touches"] } },
+  { d: "THU", am: { t: "REST", e: ["Hip flexor stretch", "Light walk"] }, pm: { t: "Mobility Only", e: ["Foam roll", "Calves + ankles"] } },
+  { d: "FRI", am: { t: "UPPER — Strength", e: ["Incline Press 4×8", "Push Press 3×5", "Lat Pulldown 3×10"] }, pm: { t: "Plyo — Hurdle & Broad", e: ["Hurdle Hops 5×5", "Broad Jumps 5×5", "Single-Leg Box Jump 4×5 ea"] } },
+  { d: "SAT", am: { t: "LOWER 🔑 — Heavy", e: ["Deadlift 4×5 @80%", "Leg Press 3×12", "Weighted Calf Raises 4×6"] }, pm: { t: "🏀 Dunk Specific", e: ["Full Approach Jumps 20 reps", "Game or scrimmage if available", "Track max reach"] } },
+  { d: "SUN", am: { t: "FULL REST", e: ["No training", "Full body stretch 30min"] }, pm: { t: "FULL REST", e: ["Refeed meal", "Walk, decompress"] } },
+];
+
+const STAPLES = {
+  protein: ["Chicken breast", "Chicken thighs", "Eggs", "Tuna", "Cottage cheese / Greek yogurt"],
+  carb: ["White rice", "Oats", "Banana", "Protein wraps", "Frozen veg mix"],
+  fat: ["Olive oil", "Peanut butter", "Mixed nuts", "Cheese", "Salmon / fish oil"],
+};
+
+const CUT = {
+  train: { kcal: 1600, p: 204, c: 64, f: 39 },
+  rest: { kcal: 1400, p: 187, c: 21, f: 34 },
+};
+
+const PEPTIDES = [
+  ["BPC-157", "2 sprays", "Morning fasted", "var(--g)"],
+  ["AOD-9604", "2 sprays", "Morning fasted", "var(--g)"],
+  ["MOTS-C", "2 sprays", "Pre-workout", "var(--y)"],
+  ["Ipamorelin + CJC-1295", "2 sprays", "Pre-bed", "var(--p)"],
+  ["SR-9009", "10mg ×3", "Every 4hrs", "var(--b)"],
+];
+
+const LEARNING = [
+  { t: "Sports Science", d: "Plyometric research, vertical jump biomechanics — direct application to the goal" },
+  { t: "Quant / Betting Systems", d: "Model refinement, EV frameworks — your ongoing analytics work" },
+  { t: "AI & Coding", d: "Sharpen the tools behind your dashboards and projection engines" },
+  { t: "Music & Repertoire", d: "Score study, listening, historical context for orchestral works" },
+];
+
+const DEEPWORK = [
+  { t: "Bassoon Repertoire", d: "Focused practice block — no phone, no distraction. Audition or rep prep." },
+  { t: "Analytics Build", d: "Edge Lab, projection models, dashboards — ship something each session." },
+];
+
+const MEALS = {
+  train: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["30–45 min walk or light jog", "Peptides after cardio — fasted the whole time"], tip: "Do this before anything else. Biggest daily fat burner." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "Tracker-verified. Scramble eggs, mix whey into yogurt, ketchup on eggs." },
+    { time: "12:30", name: "Chicken & Veg Lunch", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup to taste"], tip: "Tracker-verified. Batch cook 3 days at a time." },
+    { time: "15:30", name: "Pre-Workout Tuna", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna (120g each) — 145 kcal", "Ketchup"], tip: "Closes the protein gap. Eat 60 min before training." },
+    { time: "18:30", name: "Post-Workout Chicken & Rice", kcal: 455, p: 43, c: 38, f: 4, items: ["150g chicken breast (cooked) — 196 kcal", "40g rice dry weight — 134 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Your only real carb hit of the day — keep rice to 40g dry." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every single night. Never skip this." },
+  ],
+  rest: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["45 min walk — longer today", "No training so this is your only burn"], tip: "Longer session on rest days." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 363, p: 47, c: 2, f: 18, items: ["4 whole eggs — 236 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "No yogurt on rest days — saves 128 kcal." },
+    { time: "12:00", name: "Chicken & Veg", kcal: 290, p: 37, c: 6, f: 4, items: ["150g chicken breast (cooked) — 196 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Smaller chicken portion today. No rice." },
+    { time: "15:00", name: "Tuna Hit", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna — 145 kcal", "Ketchup"], tip: "Pure protein bridge — kills rest day hunger." },
+    { time: "18:30", name: "Chicken & Veg Dinner", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Biggest meal of your rest day. No rice tonight." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Always. Every night." },
+  ],
+  wrap: [
+    { cardio: true, time: "06:30", name: "Fasted Cardio", items: ["30–45 min walk or jog"], tip: "Same as every day. Non-negotiable." },
+    { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey — 119 kcal", "10g ketchup — 8 kcal"], tip: "Same as training day. Full breakfast." },
+    { time: "12:30", name: "Tuna Wrap Lunch", kcal: 383, p: 47, c: 30, f: 8, items: ["2 tins tuna — 145 kcal", "1 protein wrap 80g — 234 kcal", "Ketchup — 4 kcal"], tip: "Wrap replaces rice today. No cheese — too many calories." },
+    { time: "15:30", name: "Pre-Workout: Chicken", kcal: 261, p: 49, c: 4, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "Ketchup"], tip: "No carbs needed — wrap at lunch covered it." },
+    { time: "18:30", name: "Post-Workout Chicken & Veg", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast (cooked) — 261 kcal", "200g frozen veg — 94 kcal", "Ketchup"], tip: "No rice tonight — wrap was your carb hit." },
+    { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every night. Always." },
+  ],
+};
+const MEAL_TOTALS = {
+  train: { kcal: 1616, p: 204, c: 64, f: 39 },
+  rest: { kcal: 1323, p: 187, c: 21, f: 34 },
+  wrap: { kcal: 1660, p: 227, c: 60, f: 46 },
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+const todayKey = new Date().toISOString().slice(0,10);
+let checkedRules = JSON.parse(localStorage.getItem("rules-"+todayKey) || "{}");
+let openDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1; // Mon=0
+let dayType = "train";
+let mealDayType = "train";
+let openMeals = {};
+let navIndex = 0;
+
+function saveRules(){ localStorage.setItem("rules-"+todayKey, JSON.stringify(checkedRules)); }
+
+// ── DATE MATH ────────────────────────────────────────────────────────────
+function updateDates(){
+  const now = new Date();
+  const dayNum = Math.max(1, Math.floor((now - START) / 86400000) + 1);
+  const daysToCut = Math.max(0, Math.round((CUT_END - now) / 86400000));
+  const daysToDunk = Math.max(0, Math.round((DUNK_TARGET - now) / 86400000));
+  document.getElementById("dayNum").textContent = "DAY " + dayNum;
+  document.getElementById("dayTotal").textContent = "OF " + TOTAL_DAYS;
+  document.getElementById("daysToCut").textContent = daysToCut + "d";
+  document.getElementById("daysToDunk").textContent = daysToDunk + "d";
+}
+
+// ── NAV ──────────────────────────────────────────────────────────────────
+const NAVS = ["TODAY","TRAINING","MEALS","FUEL","MIND","PROGRESS"];
+const navBar = document.getElementById("navBar");
+NAVS.forEach((n,i)=>{
+  const btn = document.createElement("button");
+  btn.textContent = n;
+  if(i===0) btn.classList.add("active");
+  btn.onclick = () => { navIndex = i; renderNav(); };
+  navBar.appendChild(btn);
+});
+function renderNav(){
+  [...navBar.children].forEach((b,i)=>b.classList.toggle("active", i===navIndex));
+  ["today","training","meals","fuel","mind","progress"].forEach((id,i)=>{
+    document.getElementById("panel-"+id).classList.toggle("active", i===navIndex);
+  });
+}
+
+// ── RENDER: TODAY ────────────────────────────────────────────────────────
+function renderToday(){
+  const el = document.getElementById("panel-today");
+  const done = RULES.filter((_,i)=>checkedRules[i]).length;
+  let html = `<div class="card" style="margin-bottom:14px;">
+    <div class="section-head">RULES COMPLETED TODAY</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="mono" style="font-size:28px;font-weight:900;color:var(--g);">${done}<span style="font-size:14px;color:var(--muted);">/5</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${(done/5)*100}%;"></div></div>
+    </div>
+  </div>`;
+  RULES.forEach((r,i)=>{
+    const isDone = !!checkedRules[i];
+    html += `<div class="rule-row ${isDone?'done':''}" onclick="toggleRule(${i})">
+      <div class="checkbox ${isDone?'done':''}"></div>
+      <span style="font-size:22px;">${r.icon}</span>
+      <div style="flex:1;">
+        <div class="rule-title ${isDone?'strike':''}">${r.title}</div>
+        <div class="rule-sub">${r.sub}</div>
+      </div>
+    </div>`;
+  });
+  html += `<div class="card" style="margin-top:16px;background:rgba(77,166,255,.04);border-color:rgba(77,166,255,.25);">
+    <div class="section-head" style="color:var(--b);">PRELIMINARY STEPS — DO ONCE</div>`;
+  PRELIM.forEach(p=>{ html += `<div style="font-size:12px;color:#aaa;margin-bottom:6px;line-height:1.5;padding-left:12px;position:relative;"><span style="position:absolute;left:0;color:var(--b);">→</span>${p}</div>`; });
+  html += `</div>
+  <div class="note-box" style="margin-top:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);">Two-a-days with a clear plan are easier than one-a-day unplanned. The detail removes friction. Repeatable beats optimal — same staples, same rituals, every single day.</div>`;
+  el.innerHTML = html;
+}
+function toggleRule(i){ checkedRules[i] = !checkedRules[i]; saveRules(); renderToday(); }
+
+// ── RENDER: TRAINING ─────────────────────────────────────────────────────
+function renderTraining(){
+  const el = document.getElementById("panel-training");
+  let tabs = `<div class="day-tabs">`;
+  WEEK.forEach((w,i)=>{ tabs += `<div class="day-tab ${i===openDay?'active':''}" onclick="setDay(${i})">${w.d}</div>`; });
+  tabs += `</div>`;
+  const w = WEEK[openDay];
+  let html = `<div class="note-box" style="background:rgba(200,245,66,.04);border:1px solid rgba(200,245,66,.25);margin-bottom:14px;">AM = performance, compound, dynamic. PM = filling gaps, weak links, dunk-specific work. 4+ hours between sessions — time to eat, time to recover.</div>`;
+  html += tabs;
+  html += `<div class="session-block"><div class="session-label" style="color:var(--o);">☀️ AM SESSION — ${w.am.t}</div>`;
+  w.am.e.forEach(ex=>{ html += `<div class="ex-row"><span style="color:var(--o);margin-right:8px;">→</span>${ex}</div>`; });
+  html += `</div><div class="session-block"><div class="session-label" style="color:var(--b);">🌙 PM SESSION — ${w.pm.t}</div>`;
+  w.pm.e.forEach(ex=>{ html += `<div class="ex-row"><span style="color:var(--b);margin-right:8px;">→</span>${ex}</div>`; });
+  html += `</div>`;
+  el.innerHTML = html;
+}
+function setDay(i){ openDay=i; renderTraining(); }
+
+// ── RENDER: MEALS ────────────────────────────────────────────────────────
+function renderMeals(){
+  const el = document.getElementById("panel-meals");
+  const totals = MEAL_TOTALS[mealDayType];
+  const col = mealDayType === "train" ? "var(--o)" : mealDayType === "rest" ? "var(--b)" : "var(--p)";
+  let html = `<div class="toggle-row">
+    <div class="toggle-btn ${mealDayType==='train'?'active':''}" onclick="setMealDay('train')" style="${mealDayType==='train'?'border-color:var(--o);background:rgba(245,166,35,.08);color:var(--o);':''}">🏋️ TRAINING</div>
+    <div class="toggle-btn ${mealDayType==='rest'?'active':''}" onclick="setMealDay('rest')" style="${mealDayType==='rest'?'border-color:var(--b);background:rgba(77,166,255,.08);color:var(--b);':''}">😴 REST</div>
+    <div class="toggle-btn ${mealDayType==='wrap'?'active':''}" onclick="setMealDay('wrap')" style="${mealDayType==='wrap'?'border-color:var(--p);background:rgba(183,148,244,.08);color:var(--p);':''}">🌯 WRAP DAY</div>
+  </div>`;
+  html += `<div class="macro-box">
+    <div class="mono" style="font-size:9px;color:var(--muted);margin-bottom:4px;">DAILY TOTAL</div>
+    <div class="kcal-num" style="color:${col};">${totals.kcal.toLocaleString()}</div>
+    ${bar('PROTEIN', totals.p, 250, 'var(--g)')}
+    ${bar('CARBS', totals.c, 150, 'var(--o)')}
+    ${bar('FAT', totals.f, 80, 'var(--r)')}
+  </div>`;
+  MEALS[mealDayType].forEach((meal, i)=>{
+    if(meal.cardio){
+      html += `<div class="cardio-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:18px;">🏃</span>
+          <div style="flex:1;">
+            <div class="mono" style="font-size:9px;color:var(--y);margin-bottom:1px;">${meal.time}</div>
+            <div style="font-size:14px;font-weight:700;color:var(--y);">${meal.name}</div>
+          </div>
+          <div class="mono" style="font-size:9px;color:var(--y);background:rgba(255,221,0,.1);padding:3px 8px;border-radius:20px;border:1px solid rgba(255,221,0,.25);">FASTED</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;">${meal.tip}</div>
+      </div>`;
+    } else {
+      const isOpen = !!openMeals[mealDayType+i];
+      html += `<div class="meal-card" style="border-color:${isOpen?col:'var(--border)'};">
+        <div class="meal-head" onclick="toggleMeal('${mealDayType}',${i})">
+          <div style="flex:1;">
+            <div class="meal-time" style="color:${col};">${meal.time}</div>
+            <div class="meal-name">${meal.name}</div>
+          </div>
+          <div class="meal-macros">
+            <div class="meal-macro"><div class="v" style="color:var(--g);">${meal.p}</div><div class="l">P</div></div>
+            <div class="meal-macro"><div class="v" style="color:var(--o);">${meal.c}</div><div class="l">C</div></div>
+            <div class="meal-macro"><div class="v" style="color:var(--r);">${meal.f}</div><div class="l">F</div></div>
+            <div class="mono" style="font-size:11px;color:${col};font-weight:700;margin-left:4px;">${meal.kcal}</div>
+            <span class="mono" style="font-size:10px;color:var(--muted);">${isOpen?'▲':'▼'}</span>
+          </div>
+        </div>
+        <div class="meal-body ${isOpen?'open':''}">
+          <div style="padding-top:10px;">`;
+      meal.items.forEach((item)=>{
+        html += `<div class="meal-item"><span style="color:${col};margin-right:8px;">→</span>${item}</div>`;
+      });
+      html += `</div><div class="meal-tip" style="background:${col.replace('var(','').replace(')','')==='--g'?'rgba(200,245,66,.06)':'rgba(255,255,255,.03)'};border:1px solid var(--border);">${meal.tip}</div>
+        </div>
+      </div>`;
+    }
+  });
+  html += `<div class="note-box" style="margin-top:10px;background:rgba(200,245,66,.04);border:1px solid rgba(200,245,66,.2);">Protein target is 200g+ every day. Weigh chicken raw before cooking. Wrap days swap rice for protein wraps — use when rice isn't available or you want variety.</div>`;
+  el.innerHTML = html;
+}
+function setMealDay(t){ mealDayType=t; renderMeals(); }
+function toggleMeal(type, i){ const k=type+i; openMeals[k] = !openMeals[k]; renderMeals(); }
+
+// ── RENDER: FUEL ─────────────────────────────────────────────────────────
+function renderFuel(){
+  const el = document.getElementById("panel-fuel");
+  const m = CUT[dayType];
+  let html = `<div class="toggle-row">
+    <div class="toggle-btn ${dayType==='train'?'active':''}" onclick="setDayType('train')">🏋️ TRAINING DAY</div>
+    <div class="toggle-btn ${dayType==='rest'?'active':''}" onclick="setDayType('rest')">😴 REST DAY</div>
+  </div>`;
+  html += `<div class="macro-box">
+    <div class="mono" style="font-size:9px;color:var(--muted);margin-bottom:4px;">DAILY CALORIES</div>
+    <div class="kcal-num">${m.kcal.toLocaleString()}</div>
+    ${bar('PROTEIN', m.p, 250, 'var(--g)')}
+    ${bar('CARBS', m.c, 150, 'var(--o)')}
+    ${bar('FAT', m.f, 80, 'var(--r)')}
+  </div>`;
+  html += `<div class="section-head">STAPLE FOODS — 5 / 5 / 5</div>`;
+  [["🥩 PROTEIN", STAPLES.protein, "var(--g)"], ["🍚 CARBS", STAPLES.carb, "var(--o)"], ["🥑 FATS", STAPLES.fat, "var(--r)"]].forEach(([label, list, col])=>{
+    html += `<div style="margin-bottom:12px;"><div class="mono" style="font-size:10px;color:${col};margin-bottom:6px;">${label}</div><div>`;
+    list.forEach(item=>{ html += `<span class="pill" style="border:1px solid ${col}30;color:var(--text);background-color:color-mix(in srgb, ${col} 10%, transparent);">${item}</span>`; });
+    html += `</div></div>`;
+  });
+  html += `<div class="section-head" style="margin-top:16px;">PEPTIDE STACK</div>`;
+  PEPTIDES.forEach(([name,dose,time,col])=>{
+    html += `<div class="pep-row" style="border-left:3px solid ${col};">
+      <div><div style="font-size:13px;font-weight:700;">${name}</div><div style="font-size:10px;color:var(--muted);margin-top:1px;">${time}</div></div>
+      <div class="mono" style="font-size:11px;color:${col};font-weight:700;">${dose}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+function bar(label, val, max, col){
+  return `<div class="bar-label"><span>${label}</span><span style="font-family:'Courier New',monospace;font-size:12px;color:${col};font-weight:700;">${val}g</span></div>
+  <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,(val/max)*100)}%;background:${col};"></div></div>`;
+}
+function setDayType(t){ dayType=t; renderFuel(); }
+
+// ── RENDER: MIND ─────────────────────────────────────────────────────────
+function renderMind(){
+  const el = document.getElementById("panel-mind");
+  let html = `<div class="section-head">📚 LEARNING — 1 HOUR DAILY</div>`;
+  LEARNING.forEach(l=>{
+    html += `<div class="item-card" style="border-left:3px solid var(--p);">
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${l.t}</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;">${l.d}</div>
+    </div>`;
+  });
+  html += `<div class="section-head" style="margin-top:18px;">🎯 DEEP WORK — 1 HOUR DAILY</div>`;
+  DEEPWORK.forEach(d=>{
+    html += `<div class="item-card" style="border-left:3px solid var(--b);">
+      <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${d.t}</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;">${d.d}</div>
+    </div>`;
+  });
+  html += `<div class="card" style="margin-top:18px;background:rgba(255,221,0,.03);border-color:rgba(255,221,0,.2);">
+    <div class="section-head" style="color:var(--y);">🌅 START BIGGER THAN LIFE AND DEATH</div>
+    <div style="font-size:12px;color:#bbb;line-height:1.7;">Five minutes before the grind starts. Breathwork, journaling, reading something that isn't about training or tasks. Take the moment to remember none of this is the whole point — it's just the vehicle.</div>
+  </div>`;
+  html += `<div class="note-box" style="margin-top:12px;background:rgba(255,255,255,.03);border:1px solid var(--border);">Plan tomorrow's learning and deep work topic the night before. Removing the decision removes the friction.</div>`;
+  el.innerHTML = html;
+}
+
+// ── RENDER: PROGRESS ─────────────────────────────────────────────────────
+function renderProgress(){
+  const el = document.getElementById("panel-progress");
+  const now = new Date();
+  const daysToCut = Math.max(0, Math.round((CUT_END - now) / 86400000));
+  const daysToDunk = Math.max(0, Math.round((DUNK_TARGET - now) / 86400000));
+  let html = `<div style="display:flex;gap:10px;margin-bottom:16px;">
+    <div class="card" style="flex:1;text-align:center;background:rgba(255,80,80,.04);border:2px solid rgba(255,80,80,.25);">
+      <div style="font-size:28px;">🔥</div>
+      <div class="mono" style="font-size:18px;font-weight:900;color:var(--r);margin-top:6px;">${daysToCut}</div>
+      <div class="mono" style="font-size:8px;color:var(--muted);letter-spacing:1px;">DAYS TO CUT</div>
+    </div>
+    <div class="card" style="flex:1;text-align:center;background:rgba(255,221,0,.04);border:2px solid rgba(255,221,0,.25);">
+      <div style="font-size:28px;">🏀</div>
+      <div class="mono" style="font-size:18px;font-weight:900;color:var(--y);margin-top:6px;">${daysToDunk}</div>
+      <div class="mono" style="font-size:8px;color:var(--muted);letter-spacing:1px;">DAYS TO DUNK</div>
+    </div>
+  </div>`;
+  html += `<div class="section-head">WEEKLY CHECKPOINTS</div>`;
+  [["📏","Max wall reach — Friday"],["⚖️","Bodyweight — daily, 7-day average"],["💪","Squat / Deadlift 1RM — every 3 weeks"],["📚","Learning hours logged this week"],["🎯","Deep work sessions completed"],["😴","Sleep quality — rate nightly 1–10"]].forEach(([icon,label])=>{
+    html += `<div class="check-item"><span style="font-size:20px;">${icon}</span><div style="font-size:13px;">${label}</div></div>`;
+  });
+  html += `<div class="note-box" style="margin-top:16px;background:rgba(77,166,255,.04);border:1px solid rgba(77,166,255,.25);">The win isn't one perfect day. It's the consistency across all ${TOTAL_DAYS}. Stay even — no peaks, no crashes. Just show up twice a day and run the system.</div>`;
+  html += `<div class="card" style="margin-top:14px;text-align:center;background:rgba(200,245,66,.05);border:2px solid rgba(200,245,66,.25);padding:20px;">
+    <div style="font-size:36px;">🏀</div>
+    <div class="mono" style="font-size:13px;font-weight:900;color:var(--g);margin-top:8px;letter-spacing:2px;">AUGUST 20TH</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px;">Repeatable beats optimal. Run the system.</div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function renderAll(){
+  renderToday(); renderTraining(); renderMeals(); renderFuel(); renderMind(); renderProgress();
+}
+updateDates();
+renderAll();
+setInterval(updateDates, 60000);
+
+// ── PWA INSTALL PROMPT ───────────────────────────────────────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').style.display = 'block';
+});
+document.getElementById('installBanner').addEventListener('click', ()=>{
+  if(deferredPrompt){ deferredPrompt.prompt(); }
+  document.getElementById('installBanner').style.display = 'none';
+});
+
+// ── SERVICE WORKER ───────────────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
