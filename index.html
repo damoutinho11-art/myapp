@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111827" />
   <meta name="color-scheme" content="dark light" />
   <meta name="description" content="Breakthrough 65 — athlete command center for dunk training, performance cut, recovery, and deep work." />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
   <title>Breakthrough 65 — Athlete OS</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" sizes="192x192" />
@@ -22,6 +22,14 @@
       <span>Offline check-ins, training, meals, and progress.</span>
     </div>
     <button id="installButton" type="button">Install</button>
+  </div>
+
+  <div id="updateBanner" class="install-banner update-banner" hidden>
+    <div>
+      <strong>Update available</strong>
+      <span>Reload to activate the newest Athlete OS.</span>
+    </div>
+    <button id="reloadButton" type="button">Reload</button>
   </div>
 
   <header class="topbar" aria-label="App identity">

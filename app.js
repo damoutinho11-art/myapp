@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const APP_VERSION = "3.0.0-visual-upgrade";
+  const APP_VERSION = "4.1.0-release-polish";
   const DAY_MS = 24 * 60 * 60 * 1000;
 
   const CONFIG = {
@@ -85,39 +85,84 @@
   const MEALS = {
     train: {
       title: "Training day",
-      headline: "Fuel the jumps, not the cravings.",
-      target: { kcal: "1,900–2,200", protein: "160–180g", carbs: "160–220g", fat: "50–70g" },
+      badge: "🏋️ Exact training fuel",
+      headline: "Exact meals. No guessing.",
+      target: { kcal: "1,616", protein: "204g", carbs: "64g", fat: "39g" },
+      rule: "Use this on heavy lifting, lower-body, jump, or basketball days. Keep the rice exactly to 40g dry weight unless you intentionally refeed.",
       meals: [
-        ["07:30", "Protein breakfast", ["Eggs or Greek yogurt + whey", "Fruit or oats if morning training", "Water + salt if you wake flat"]],
-        ["12:30", "Chicken / tuna / eggs lunch", ["Lean protein", "Rice, potato, wrap, or oats", "Vegetables you can repeat daily"]],
-        ["60–90 min pre", "Pre-workout fuel", ["30–60g easy carbs", "20–40g protein", "No heavy fat right before jumps"]],
-        ["Post", "Recovery meal", ["Protein first", "Carbs after leg/jump days", "Hydrate before caffeine"]],
-        ["21:00", "Night protein", ["Cottage cheese / Greek yogurt / lean protein", "Prepare tomorrow before bed"]]
+        { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "Tracker-verified. Scramble eggs, mix whey into yogurt, ketchup on eggs." },
+        { time: "12:30", name: "Chicken & Veg Lunch", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast, cooked — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup to taste"], tip: "Batch cook 3 days at a time. Keep the chicken entry consistent: cooked weight in this app." },
+        { time: "15:30", name: "Pre-Workout Tuna", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna, 120g each — 145 kcal", "Ketchup"], tip: "Closes the protein gap. Eat about 60 minutes before training." },
+        { time: "18:30", name: "Post-Workout Chicken & Rice", kcal: 455, p: 43, c: 38, f: 4, items: ["150g chicken breast, cooked — 196 kcal", "40g rice, dry weight — 134 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Your main carb hit of the day. Keep rice to 40g dry weight." },
+        { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every night. Prepare it before bed so the plan survives tired evenings." }
+      ]
+    },
+
+    lower: {
+      title: "Lower high-carb",
+      badge: "🚀 Exact lower-body fuel",
+      headline: "More carbs for jump days.",
+      target: { kcal: "1,855", protein: "208g", carbs: "121g", fat: "39g" },
+      rule: "Use this on hard lower-body, approach-jump, basketball, or testing days when jump quality matters more than aggressive cutting.",
+      meals: [
+        { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "Same base as the normal training day. Do not skip breakfast on max jump days." },
+        { time: "12:30", name: "Chicken & Veg Lunch", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast, cooked — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup to taste"], tip: "Keep this clean so the extra carbs stay around training." },
+        { time: "15:30", name: "Pre-Workout Tuna + Banana", kcal: 250, p: 31, c: 27, f: 2, items: ["2 tins tuna, 120g each — 145 kcal", "1 medium banana — 105 kcal", "Ketchup"], tip: "Use 45–75 minutes before jumping. This is the small performance boost meal." },
+        { time: "18:30", name: "Post-Workout Chicken & Double Rice", kcal: 589, p: 46, c: 68, f: 4, items: ["150g chicken breast, cooked — 196 kcal", "80g rice, dry weight — 268 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Double rice only on the days that actually need it. Log jump quality after." },
+        { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every night. Prepare it before bed so the plan survives tired evenings." }
       ]
     },
     rest: {
       title: "Rest day",
-      headline: "Recover without losing the cut.",
-      target: { kcal: "1,800–2,050", protein: "160–180g", carbs: "100–160g", fat: "55–75g" },
+      badge: "😴 Exact rest cut",
+      headline: "Lower carbs. Protein stays high.",
+      target: { kcal: "1,323", protein: "187g", carbs: "21g", fat: "34g" },
+      rule: "Use this on full rest or recovery-only days. No rice, no wrap, no accidental snack creep.",
       meals: [
-        ["Morning", "Easy walk + breakfast", ["Protein anchor", "Fruit or vegetables", "No forced fasted grind if sleep is poor"]],
-        ["Lunch", "Large simple meal", ["Lean protein", "Big vegetables", "Controlled carbs, not zero carbs"]],
-        ["Afternoon", "Hunger bridge", ["Tuna, yogurt, cottage cheese, or eggs", "Water before extra snacks"]],
-        ["Dinner", "Recovery dinner", ["Protein + vegetables", "Carbs if legs feel drained", "Stop chasing extreme restriction"]]
+        { time: "07:30", name: "Egg Breakfast", kcal: 363, p: 47, c: 2, f: 18, items: ["4 whole eggs — 236 kcal", "1 scoop whey protein — 119 kcal", "10g ketchup — 8 kcal"], tip: "No yogurt on rest days — saves 128 kcal." },
+        { time: "12:00", name: "Chicken & Veg", kcal: 290, p: 37, c: 6, f: 4, items: ["150g chicken breast, cooked — 196 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Smaller chicken portion today. No rice." },
+        { time: "15:00", name: "Tuna Hit", kcal: 145, p: 30, c: 0, f: 2, items: ["2 tins tuna — 145 kcal", "Ketchup"], tip: "Pure protein bridge. Use it to kill rest-day hunger." },
+        { time: "18:30", name: "Chicken & Veg Dinner", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast, cooked — 261 kcal", "200g frozen veg mix — 94 kcal", "Ketchup"], tip: "Biggest meal of the rest day. No rice tonight." },
+        { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Always. Every night." }
       ]
     },
     wrap: {
       title: "Wrap day",
-      headline: "Simple, portable, repeatable.",
-      target: { kcal: "1,900–2,150", protein: "170–200g", carbs: "140–200g", fat: "50–70g" },
+      badge: "🌯 Exact wrap day",
+      headline: "Portable version. Still exact.",
+      target: { kcal: "1,660", protein: "227g", carbs: "60g", fat: "46g" },
+      rule: "Use this when rice is not practical or you want variety. The wrap replaces the rice carb hit.",
       meals: [
-        ["Breakfast", "Full protein breakfast", ["Eggs or yogurt + whey", "Banana if training soon"]],
-        ["Lunch", "Tuna or chicken wrap", ["One high-protein wrap", "Lean filling", "Vegetables and low-cal sauce"]],
-        ["Pre-workout", "Light fuel", ["Protein + optional fruit", "Avoid heavy fats pre-jump"]],
-        ["Dinner", "Chicken + vegetables", ["Add rice/potato if the session was hard", "Keep the plan repeatable"]]
+        { time: "07:30", name: "Egg Breakfast", kcal: 491, p: 58, c: 13, f: 23, items: ["4 whole eggs — 236 kcal", "200g Greek yogurt 2.5% — 128 kcal", "1 scoop whey — 119 kcal", "10g ketchup — 8 kcal"], tip: "Same as training day. Full breakfast." },
+        { time: "12:30", name: "Tuna Wrap Lunch", kcal: 383, p: 47, c: 30, f: 8, items: ["2 tins tuna — 145 kcal", "1 protein wrap, 80g — 234 kcal", "Ketchup — 4 kcal"], tip: "Wrap replaces rice today. No cheese — too many calories." },
+        { time: "15:30", name: "Pre-Workout Chicken", kcal: 261, p: 49, c: 4, f: 5, items: ["200g chicken breast, cooked — 261 kcal", "Ketchup"], tip: "No extra carbs needed — wrap at lunch covered it." },
+        { time: "18:30", name: "Post-Workout Chicken & Veg", kcal: 355, p: 49, c: 8, f: 5, items: ["200g chicken breast, cooked — 261 kcal", "200g frozen veg — 94 kcal", "Ketchup"], tip: "No rice tonight — wrap was your carb hit." },
+        { time: "21:00", name: "Night Casein", kcal: 170, p: 24, c: 5, f: 5, items: ["200g light cottage cheese 3% — 170 kcal"], tip: "Every night. Always." }
       ]
     }
   };
+
+  const MEAL_STAPLES = [
+    ["Protein", ["Chicken breast", "Eggs", "Tuna", "Greek yogurt 2.5%", "Whey protein", "Light cottage cheese 3%"]],
+    ["Carbs", ["40g dry rice on training day", "80g protein wrap on wrap day", "Frozen veg mix", "Greek yogurt carbs count too"]],
+    ["Rules", ["Protein stays high every day", "Training day gets rice", "Rest day gets no rice/wrap", "Use the same food tracker entries every time"]]
+  ];
+
+
+
+  const PREP_GUIDES = {
+    train: ["3 training days: 12 eggs", "600g Greek yogurt 2.5%", "3 scoops whey", "1,050g cooked chicken breast", "6 tins tuna", "120g dry rice", "1,200g frozen veg", "600g light cottage cheese 3%", "Ketchup"],
+    lower: ["3 lower/jump days: 12 eggs", "600g Greek yogurt 2.5%", "3 scoops whey", "1,050g cooked chicken breast", "6 tins tuna", "3 bananas", "240g dry rice", "1,200g frozen veg", "600g light cottage cheese 3%", "Ketchup"],
+    rest: ["3 rest days: 12 eggs", "3 scoops whey", "1,050g cooked chicken breast", "6 tins tuna", "1,200g frozen veg", "600g light cottage cheese 3%", "Ketchup"],
+    wrap: ["3 wrap days: 12 eggs", "600g Greek yogurt 2.5%", "3 scoops whey", "6 tins tuna", "3 protein wraps, 80g each", "1,200g cooked chicken breast", "600g frozen veg", "600g light cottage cheese 3%", "Ketchup"]
+  };
+
+  const EMERGENCY_RULES = [
+    ["No-cook rescue", "2 tins tuna + 1 protein wrap + cottage cheese. Not perfect, but it protects protein without ordering junk."],
+    ["Rehearsal day", "Pack tuna, wrap, banana, whey shaker, and cottage cheese before leaving home."],
+    ["Low appetite", "Finish protein first, then rice/banana if it is a jump day."],
+    ["Hunger spike", "Drink water, eat frozen veg/chicken, then reassess after 20 minutes. Do not snack randomly."],
+  ];
 
   const RECOVERY = [
     ["Warm-up before every lower/jump session", "5–8 min pulse raiser, ankles, hips, pogos, low jumps before intense contacts."],
@@ -149,18 +194,23 @@
   ];
 
   const STORE = {
-    rulesPrefix: "breakthrough.rules.v3.",
-    checkins: "breakthrough.checkins.v3",
-    oldCheckins: "breakthrough.checkins.v2"
+    rulesPrefix: "breakthrough.rules.",
+    legacyRulesPrefix: "breakthrough.rules.v3.",
+    checkins: "breakthrough.checkins",
+    legacyCheckinsV3: "breakthrough.checkins.v3",
+    legacyCheckinsV2: "breakthrough.checkins.v2",
+    mealLogsPrefix: "breakthrough.meals."
   };
 
   const state = {
     nav: "today",
     dayIndex: todayWeekIndex(),
     mealType: "train",
-    rules: getJSON(STORE.rulesPrefix + localKey(), {}),
-    checkins: getJSON(STORE.checkins, getJSON(STORE.oldCheckins, {})),
-    installPrompt: null
+    rules: getJSON(STORE.rulesPrefix + localKey(), getJSON(STORE.legacyRulesPrefix + localKey(), {})),
+    checkins: getJSON(STORE.checkins, getJSON(STORE.legacyCheckinsV3, getJSON(STORE.legacyCheckinsV2, {}))),
+    mealLogs: getJSON(STORE.mealLogsPrefix + localKey(), {}),
+    installPrompt: null,
+    waitingWorker: null
   };
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -241,7 +291,7 @@
           <div class="command-card__inner">
             <div class="hero-grid">
               <div>
-                <p class="kicker">Athlete command center · v3 redesign</p>
+                <p class="kicker">Athlete command center · v4.1</p>
                 <h2 class="hero-title">Build bounce without breaking.</h2>
                 <p class="hero-copy">Today is ${escapeHTML(todayPlan.day)}: ${escapeHTML(todayPlan.theme)}. Hit the essentials, log the signals, and stop before fatigue steals tomorrow.</p>
               </div>
@@ -258,6 +308,8 @@
         </section>
 
         <div id="readinessBox"></div>
+        <div id="governorBox"></div>
+        ${todayMealSnapshot()}
 
         <section class="grid grid--three" aria-label="Quick status">
           <article class="card card--lime"><p class="section-kicker">Checklist</p><h3>${done}/${RULES.length} locked</h3><p>${checklistPct}% of the day is complete.</p></article>
@@ -280,6 +332,7 @@
       </div>
     `;
     renderReadiness();
+    renderGovernor();
     populateForm();
   }
 
@@ -389,6 +442,82 @@
     `;
   }
 
+
+
+  function recentCheckins(limit = 7) {
+    return Object.values(state.checkins).filter(Boolean).sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, limit);
+  }
+
+  function trendWarning() {
+    const rows = recentCheckins(10).slice().reverse();
+    const weights = rows.map((row) => ({ date: row.date, weight: Number(row.weight) })).filter((row) => Number.isFinite(row.weight) && row.weight > 0);
+    const sleeps = rows.map((row) => Number(row.sleep)).filter((n) => Number.isFinite(n) && n > 0);
+    const knees = rows.map((row) => Number(row.knee)).filter((n) => Number.isFinite(n));
+    const soreness = rows.map((row) => Number(row.soreness)).filter((n) => Number.isFinite(n));
+
+    const warnings = [];
+    if (weights.length >= 2) {
+      const first = weights[0].weight;
+      const last = weights[weights.length - 1].weight;
+      const drop = first - last;
+      const pct = first ? (drop / first) * 100 : 0;
+      if (pct > 1.25) warnings.push(["Cut speed", `Weight is down ${pct.toFixed(1)}% across recent logs. Raise food or reduce fatigue if jump quality drops.`]);
+    }
+    if (sleeps.length >= 3) {
+      const avgSleep = sleeps.reduce((a, b) => a + b, 0) / sleeps.length;
+      if (avgSleep < 6) warnings.push(["Sleep debt", `Recent average sleep is ${avgSleep.toFixed(1)}h. Remove max jumps until sleep is back above 6h.`]);
+    }
+    if (knees.filter((n) => n >= 4).length >= 2) warnings.push(["Knee trend", "Knee pain has hit 4/10+ more than once. Swap plyos for recovery and get assessed if it repeats."]);
+    if (soreness.filter((n) => n >= 8).length >= 2) warnings.push(["Soreness trend", "High soreness is repeating. Deload lower-body volume before it becomes an injury problem."]);
+    return warnings;
+  }
+
+  function renderGovernor() {
+    const warnings = trendWarning();
+    const box = $("#governorBox");
+    if (!box) return;
+    const good = !warnings.length;
+    box.innerHTML = `
+      <article class="governor ${good ? "governor--green" : "governor--amber"}">
+        <p class="section-kicker">Cut safety governor</p>
+        <h3>${good ? "Trend check is clean" : "Adjust before forcing more volume"}</h3>
+        ${good ? `<p>No recent red trend from logged weight, sleep, knees, or soreness. Keep logging honestly.</p>` : `<ul class="clean">${warnings.map(([title, copy]) => `<li><strong>${escapeHTML(title)}:</strong> ${escapeHTML(copy)}</li>`).join("")}</ul>`}
+      </article>
+    `;
+  }
+
+  function todayMealSnapshot() {
+    const meal = MEALS[state.mealType];
+    const done = completedMealsFor(state.mealType);
+    const totals = completedMacroTotals(meal, done);
+    return `
+      <article class="card card--sky">
+        <p class="section-kicker">Today fuel</p>
+        <h3>${done.size}/${meal.meals.length} meals complete · ${escapeHTML(meal.title)}</h3>
+        <p>${totals.kcal} / ${escapeHTML(meal.target.kcal)} kcal · ${totals.p}g / ${escapeHTML(meal.target.protein)} protein</p>
+      </article>
+    `;
+  }
+
+  function completedMealsFor(type = state.mealType) {
+    return new Set((state.mealLogs[type] || []).map((idx) => Number(idx)));
+  }
+
+  function completedMacroTotals(meal, doneSet) {
+    return meal.meals.reduce((acc, item, index) => {
+      if (!doneSet.has(index)) return acc;
+      acc.kcal += Number(item.kcal) || 0;
+      acc.p += Number(item.p) || 0;
+      acc.c += Number(item.c) || 0;
+      acc.f += Number(item.f) || 0;
+      return acc;
+    }, { kcal: 0, p: 0, c: 0, f: 0 });
+  }
+
+  function saveMealLogs() {
+    setJSON(STORE.mealLogsPrefix + localKey(), state.mealLogs);
+  }
+
   function renderTraining() {
     const day = WEEK[state.dayIndex];
     const tabs = WEEK.map((item, index) => `<button class="tab" type="button" aria-selected="${state.dayIndex === index}" data-day="${index}">${item.day}</button>`).join("");
@@ -423,37 +552,80 @@
   function renderMeals() {
     const meal = MEALS[state.mealType];
     const toggles = Object.entries(MEALS).map(([key, value]) => `<button class="toggle" type="button" aria-pressed="${state.mealType === key}" data-meal="${key}">${escapeHTML(value.title)}</button>`).join("");
+    const done = completedMealsFor();
+    const totals = completedMacroTotals(meal, done);
+    const percent = Math.round((done.size / meal.meals.length) * 100);
     $("#panel-meals").innerHTML = `
       <div class="stack">
         <section class="command-card">
           <div class="command-card__inner">
-            <p class="kicker">Nutrition cockpit</p>
+            <p class="kicker">Nutrition cockpit · ${escapeHTML(meal.badge)}</p>
             <h2 class="hero-title">${escapeHTML(meal.headline)}</h2>
-            <p class="hero-copy">Performance cut: repeatable meals, high protein, carbs placed where they help jumps, no crash diet heroics.</p>
+            <p class="hero-copy">Exact foods, exact portions, exact macros — now with meal checkoffs, grocery prep, and safer lower-body fueling.</p>
           </div>
         </section>
         <div class="toggle-row">${toggles}</div>
-        <article class="card">
-          <p class="section-kicker">Target range</p>
+        <article class="card card--lime">
+          <p class="section-kicker">Exact daily total</p>
           <div class="macro-grid">
             ${metric(meal.target.kcal, "calories")}
             ${metric(meal.target.protein, "protein")}
             ${metric(meal.target.carbs, "carbs")}
             ${metric(meal.target.fat, "fat")}
           </div>
+          <p class="exact-note">${escapeHTML(meal.rule)}</p>
         </article>
-        <section aria-label="Meal structure">
-          ${meal.meals.map(([time, name, items], index) => mealCard(time, name, items, index === 0)).join("")}
+        <article class="card">
+          <p class="section-kicker">Meal completion</p>
+          <h3>${done.size}/${meal.meals.length} complete · ${percent}%</h3>
+          <div class="meal-progress" aria-label="Meal completion ${percent}%"><span style="width:${percent}%"></span></div>
+          <p>${totals.kcal} kcal · ${totals.p}g protein · ${totals.c}g carbs · ${totals.f}g fat logged from completed meals.</p>
+          <div class="action-row"><button class="secondary" type="button" data-action="clear-meals">Clear meal checkoffs</button></div>
+        </article>
+        <section aria-label="Exact meal structure">
+          ${meal.meals.map((item, index) => mealCard(item, index === 0, done.has(index), index)).join("")}
         </section>
+        <section class="grid grid--two" aria-label="Grocery and emergency prep">
+          <article class="card card--sky"><p class="section-kicker">3-day grocery prep</p><h3>${escapeHTML(meal.title)}</h3><ul class="clean">${(PREP_GUIDES[state.mealType] || []).map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul></article>
+          <article class="card"><p class="section-kicker">Emergency rules</p><h3>Protect the plan when life gets messy.</h3><ul class="clean">${EMERGENCY_RULES.map(([title, copy]) => `<li><strong>${escapeHTML(title)}:</strong> ${escapeHTML(copy)}</li>`).join("")}</ul></article>
+        </section>
+        <section class="grid grid--three" aria-label="Staples and rules">
+          ${MEAL_STAPLES.map(([title, items]) => `<article class="card"><p class="section-kicker">Staples</p><h3>${escapeHTML(title)}</h3><ul class="clean">${items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul></article>`).join("")}
+        </section>
+        <article class="card card--dark">
+          <p class="section-kicker">Adjustment rule</p>
+          <h3>Do not freestyle the meals during the cut.</h3>
+          <p>If scale trend drops too fast, sleep collapses, or jump performance tanks, use the lower high-carb day or deliberately raise food. Do not solve it with random snacks.</p>
+        </article>
       </div>
     `;
   }
 
-  function mealCard(time, name, items, open) {
+  function mealCard(meal, open, done, index) {
+    const stats = [
+      [meal.kcal, "kcal"],
+      [meal.p, "P"],
+      [meal.c, "C"],
+      [meal.f, "F"]
+    ].map(([value, label]) => `<span class="meal-stat"><strong>${escapeHTML(value)}</strong><em>${escapeHTML(label)}</em></span>`).join("");
     return `
-      <details class="meal-card" ${open ? "open" : ""}>
-        <summary><div class="meal-title"><span class="meal-time">${escapeHTML(time)}</span><strong>${escapeHTML(name)}</strong></div><span aria-hidden="true">⌄</span></summary>
-        <div class="meal-body"><ul class="clean">${items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul></div>
+      <details class="meal-card ${done ? "is-done" : ""}" ${open ? "open" : ""}>
+        <summary>
+          <div class="meal-title">
+            <span class="meal-time">${escapeHTML(meal.time)}</span>
+            <strong>${escapeHTML(meal.name)}</strong>
+          </div>
+          <div class="meal-stats">${stats}</div>
+        </summary>
+        <div class="meal-body">
+          <button class="check-row ${done ? "is-done" : ""}" type="button" aria-pressed="${done}" data-meal-check="${index}">
+            <span class="checkbox" aria-hidden="true"></span>
+            <span class="rule-row__icon" aria-hidden="true">${done ? "✅" : "🍽️"}</span>
+            <span><span class="rule-title">${done ? "Meal complete" : "Mark meal complete"}</span><span class="rule-sub">Updates today's meal totals on this device.</span></span>
+          </button>
+          <ul class="clean">${meal.items.map((item) => `<li>${escapeHTML(item)}</li>`).join("")}</ul>
+          <p class="meal-tip">${escapeHTML(meal.tip)}</p>
+        </div>
       </details>
     `;
   }
@@ -494,11 +666,17 @@
         </div>
         <article class="card">
           <p class="section-kicker">Data controls</p>
-          <p>Your logs stay in this browser's local storage.</p>
+          <p>Your logs stay in this browser's local storage. Export before changing phones. Import restores check-ins and meal checkoffs.</p>
           <div class="action-row">
             <button class="primary" type="button" data-action="export-data">Export JSON</button>
+            <button class="secondary" type="button" data-action="pick-import">Import JSON</button>
             <button class="danger" type="button" data-action="reset-data">Reset logs</button>
           </div>
+          <input id="importFile" type="file" accept="application/json,.json" hidden>
+        </article>
+        <article class="card card--sky">
+          <p class="section-kicker">Trend warnings</p>
+          ${trendWarning().length ? `<ul class="clean">${trendWarning().map(([title, copy]) => `<li><strong>${escapeHTML(title)}:</strong> ${escapeHTML(copy)}</li>`).join("")}</ul>` : `<h3>No red trend from recent logs.</h3><p>Keep logging weight, sleep, knees, soreness, and touch height honestly.</p>`}
         </article>
         <article class="card">
           <p class="section-kicker">Latest check-ins</p>
@@ -533,6 +711,7 @@
       <div class="stack">
         <section class="command-card"><div class="command-card__inner"><p class="kicker">Safety gate</p><h2 class="hero-title">Do not obey bad orders.</h2><p class="hero-copy">The app should help you train. It should never pressure you into unsafe drugs, reckless cutting, or injury volume.</p></div></section>
         <article class="card card--red"><p class="section-kicker">Important change</p><h3>Unsafe dosing instructions were removed.</h3><p>The protocol keeps training, nutrition, recovery, and doctor-approved judgment. It does not give peptide/SARM-style dosing or medical permission.</p></article>
+        <article class="card card--sky"><p class="section-kicker">App version</p><h3>${escapeHTML(APP_VERSION)}</h3><p>Use this when checking whether GitHub Pages and the PWA cache updated correctly.</p><div class="action-row"><button class="secondary" type="button" data-action="check-update">Check for update</button><button class="primary" type="button" data-action="reload-app">Reload app</button></div></article>
         <div class="grid grid--two">
           ${SAFETY.map(([title, copy]) => `<article class="card"><h3>${escapeHTML(title)}</h3><p>${escapeHTML(copy)}</p></article>`).join("")}
         </div>
@@ -546,6 +725,7 @@
       version: APP_VERSION,
       exportedAt: new Date().toISOString(),
       checkins: state.checkins,
+      mealLogs: state.mealLogs,
       todayRules: state.rules
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -559,11 +739,55 @@
     URL.revokeObjectURL(url);
   }
 
+
+  function importDataFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      try {
+        const payload = JSON.parse(String(reader.result || "{}"));
+        const importedCheckins = payload.checkins && typeof payload.checkins === "object" ? payload.checkins : null;
+        const importedMealLogs = payload.mealLogs && typeof payload.mealLogs === "object" ? payload.mealLogs : null;
+        if (!importedCheckins && !importedMealLogs) throw new Error("No importable data found.");
+        if (importedCheckins) state.checkins = { ...state.checkins, ...importedCheckins };
+        if (importedMealLogs) state.mealLogs = { ...state.mealLogs, ...importedMealLogs };
+        setJSON(STORE.checkins, state.checkins);
+        saveMealLogs();
+        window.alert("Import complete. Check-ins and meal checkoffs were merged into this device.");
+        renderAll();
+      } catch (error) {
+        window.alert(`Import failed: ${error.message}`);
+      }
+    });
+    reader.readAsText(file);
+  }
+
+  async function checkForUpdate() {
+    if (!("serviceWorker" in navigator)) {
+      window.alert("Service worker updates are not available in this browser.");
+      return;
+    }
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) {
+      window.alert("No service worker is registered yet. Reload once, then check again.");
+      return;
+    }
+    await registration.update();
+    window.alert("Update check finished. If a new version is available, reload the app.");
+  }
+
+  function showUpdateBanner() {
+    const banner = $("#updateBanner");
+    if (banner) banner.hidden = false;
+  }
+
   function resetData() {
-    const ok = window.confirm("Reset all Breakthrough check-in logs on this device?");
+    const ok = window.confirm("Reset all Breakthrough check-in logs and meal checkoffs on this device?");
     if (!ok) return;
     state.checkins = {};
+    state.mealLogs = {};
     setJSON(STORE.checkins, state.checkins);
+    saveMealLogs();
     renderAll();
   }
 
@@ -601,18 +825,40 @@
         return;
       }
 
+      const mealCheck = event.target.closest("[data-meal-check]");
+      if (mealCheck) {
+        const index = Number(mealCheck.dataset.mealCheck);
+        const done = completedMealsFor();
+        if (done.has(index)) done.delete(index); else done.add(index);
+        state.mealLogs[state.mealType] = Array.from(done).sort((a, b) => a - b);
+        saveMealLogs();
+        renderMeals();
+        return;
+      }
+
       const action = event.target.closest("[data-action]");
       if (action) {
         const type = action.dataset.action;
         if (type === "save-checkin") saveCheckin();
         if (type === "clear-today") clearTodayForm();
         if (type === "export-data") exportData();
+        if (type === "pick-import") $("#importFile")?.click();
         if (type === "reset-data") resetData();
+        if (type === "clear-meals") { state.mealLogs[state.mealType] = []; saveMealLogs(); renderMeals(); }
+        if (type === "check-update") checkForUpdate();
+        if (type === "reload-app") window.location.reload();
       }
     });
 
     document.addEventListener("input", (event) => {
       if (["knee", "sleep", "soreness", "energy"].includes(event.target.id)) renderReadiness();
+    });
+
+    document.addEventListener("change", (event) => {
+      if (event.target.id === "importFile") {
+        importDataFile(event.target.files?.[0]);
+        event.target.value = "";
+      }
     });
 
     window.addEventListener("beforeinstallprompt", (event) => {
@@ -658,7 +904,34 @@
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => null);
+      navigator.serviceWorker.register("./sw.js").then((registration) => {
+        if (registration.waiting) {
+          state.waitingWorker = registration.waiting;
+          showUpdateBanner();
+        }
+        registration.addEventListener("updatefound", () => {
+          const worker = registration.installing;
+          if (!worker) return;
+          worker.addEventListener("statechange", () => {
+            if (worker.state === "installed" && navigator.serviceWorker.controller) {
+              state.waitingWorker = worker;
+              showUpdateBanner();
+            }
+          });
+        });
+      }).catch(() => null);
+    });
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshing) return;
+      refreshing = true;
+      showUpdateBanner();
+    });
+
+    $("#reloadButton")?.addEventListener("click", () => {
+      if (state.waitingWorker) state.waitingWorker.postMessage({ type: "SKIP_WAITING" });
+      window.location.reload();
     });
   }
 

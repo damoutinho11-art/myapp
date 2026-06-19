@@ -1,48 +1,120 @@
-# Breakthrough 65 — Athlete OS v3 Review + Upgrade Report
+# Breakthrough 65 — Athlete OS v4.1 Review + Upgrade Report
 
 ## Verdict
 
-The earlier upgrade was too invisible. It fixed important hidden problems, but the product still looked close to the original dark checklist app. This v3 package is a real visual/product pass: new layout, new navigation, new dashboard, stronger mobile app feel, and the same safety-first philosophy.
+I would commit this version instead of v4.0.
 
-## What changed visibly
+v4.0 restored exact meals, but it still felt unfinished as a release because the meals were display-only, the update path was weak, the import path was missing, and some labels still referenced the older v3 pass. v4.1 keeps the exact meal plans and adds the daily product features that make the app more useful in real life.
 
-- Rebranded the UI from the old dark checklist look to **Diogo Athlete OS**.
-- Added a new top identity bar with a bold `65` app mark.
-- Replaced top tab navigation with a **fixed bottom mobile app navigation**.
-- Added a large **command center hero card** on each major tab.
-- Added a visible circular protocol progress ring.
-- Added quick status cards for checklist progress, latest bodyweight, and best touch.
-- Rebuilt visual styling with cream/lime/ink contrast, thick borders, hard shadows, and dashboard-style cards.
-- Made training, meals, recovery, mind, logs, and safety tabs feel like separate app screens rather than one repeated list design.
+## What I reviewed
 
-## Functional upgrades kept from the first pass
+- `index.html`
+- `styles.css`
+- `app.js`
+- `manifest.json`
+- `sw.js`
+- PWA icon references
+- Service-worker cache naming and fetch behavior
+- Static asset references
+- Release labels and user-facing version text
+- Safety language
+- Meal-plan usability
+- Local data export/import flow
 
-- Fixed the broken PWA icon references.
-- Kept the app offline-first with a safer service worker cache.
-- Kept manifest and service-worker references aligned with actual files.
-- Kept local-only check-in storage.
-- Kept JSON export.
-- Kept daily readiness logic based on sleep, knee pain, soreness, and energy.
-- Kept the inclusive 65-day timeline logic.
-- Kept accessibility basics: real buttons, tab semantics, skip link, focus states, labels, and semantic regions.
+## Main changes in v4.1
 
-## New v3 fixes after your feedback
+### 1. Release polish fixes
 
-- Removed the duplicated “Clear today’s form” button from the previous package.
-- Changed the package structure so the ZIP contains the app files directly at the root, which is easier for Netlify/static hosting.
-- Added backward local-storage fallback from v2 check-ins to v3 check-ins so earlier saved data can still appear if present in the same browser.
-- Added clearer progress summary on the Logs tab: latest logs, average sleep, and best touch.
-- Rewrote the visual system so the app no longer opens looking like the same black/green layout.
+- Changed the app version to `4.1.0-release-polish`.
+- Replaced stale UI text that said `v3 redesign` with `v4.1`.
+- Rewrote this report so it no longer describes the release as v3.
+- Kept legacy local-storage fallback for old v3/v2 check-ins so previous browser data is not thrown away.
 
-## Safety review
+### 2. Exact meals became trackable
 
-The app is intentionally not blindly obedient. I kept the safer approach:
+The meal screen now has daily meal checkoffs.
+
+For each selected meal plan, the app shows:
+
+- meals completed
+- completion percentage
+- calories completed
+- protein completed
+- carbs completed
+- fat completed
+
+Meal completion is stored locally per day.
+
+### 3. Added Lower High-Carb day
+
+The app now has a fourth exact meal mode:
+
+- Training day
+- Lower high-carb
+- Rest day
+- Wrap day
+
+The new lower high-carb plan is for hard lower-body, jump, testing, basketball, or approach-jump days where performance matters more than the strictest cut.
+
+Lower high-carb target:
+
+- 1,855 kcal
+- 208g protein
+- 121g carbs
+- 39g fat
+
+### 4. Added grocery prep
+
+Each meal plan now shows a 3-day grocery prep list.
+
+This makes the exact meals easier to execute instead of just nice to read.
+
+### 5. Added emergency nutrition rules
+
+The meal tab now includes emergency rules for:
+
+- no-cook rescue
+- rehearsal day packing
+- low appetite
+- hunger spikes
+
+The goal is to keep the user from random snacking or ordering junk when the perfect plan is inconvenient.
+
+### 6. Added cut safety governor
+
+The app now checks recent logs for red trends:
+
+- weight dropping too fast
+- sleep averaging too low
+- repeated knee pain
+- repeated high soreness
+
+The Today tab now shows a cut-safety governor card. The Progress tab also shows trend warnings.
+
+### 7. Added JSON import
+
+v4.0 had export only. v4.1 adds import.
+
+This matters because localStorage can be lost if the browser cache is cleared, if the PWA is reinstalled, or if the user changes phone.
+
+### 8. Improved PWA update handling
+
+- Service-worker cache bumped to `breakthrough-athlete-os-v4-1-release-polish`.
+- Navigation requests now use a network-first strategy for `index.html`.
+- Static assets remain cache-first.
+- Added an update banner.
+- Added a Safety-tab app version card.
+- Added `Check for update` and `Reload app` controls.
+
+This directly addresses the earlier issue where the GitHub Pages app looked unchanged because the PWA cache was still serving an old version.
+
+## Safety decisions I kept
 
 - No peptide/SARM-style dosing instructions.
 - No medical permission language.
-- No crash-cut command tone.
-- Clear stop/modify rules for knee pain, poor sleep, and high soreness.
-- Safety tab explicitly says manual judgment beats app obedience.
+- No “obey the app” pressure.
+- Pain and sleep warnings stay prominent.
+- The app explicitly says manual judgment beats the app.
 
 ## Validation performed
 
@@ -53,28 +125,38 @@ node --check app.js
 node --check sw.js
 ```
 
-Passed static asset audit:
+Passed static checks:
 
-- `index.html` references all exist.
-- `manifest.json` icons exist.
-- `sw.js` cached assets exist.
-- Old broken `icon-192_2.png` / `icon-512_2.png` references are gone.
+- `index.html` references existing assets.
+- CSP now permits the app's intentional dynamic inline styles for progress visuals.
+- `manifest.json` icon paths exist.
+- `sw.js` cache assets exist.
+- Old broken `_2.png` icon references are absent.
+- No stale public v3 release label remains except intentional legacy local-storage fallback keys.
 
-Not fully completed:
+## Files to commit
 
-- I attempted a live Chromium browser smoke test, but this environment blocks local browser navigation with `ERR_BLOCKED_BY_ADMINISTRATOR`. So I cannot honestly claim a full interactive browser click-through in this sandbox.
+Commit these files directly at the GitHub Pages repo root:
 
-## Files in this package
+```text
+index.html
+styles.css
+app.js
+manifest.json
+sw.js
+icon-192.png
+icon-512.png
+REVIEW_AND_UPGRADE_REPORT.md
+```
 
-- `index.html`
-- `styles.css`
-- `app.js`
-- `manifest.json`
-- `sw.js`
-- `icon-192.png`
-- `icon-512.png`
-- `REVIEW_AND_UPGRADE_REPORT.md`
+## Suggested commit message
 
-## My self-review
+```text
+Upgrade Athlete OS v4.1 release polish
+```
 
-This version is meaningfully better than the previous answer because the improvement is immediately visible, not only internal. It also fixes a real regression I introduced previously: the duplicate clear button. The main remaining limitation is that it is still a static local PWA, not a full backend app. That is appropriate for the uploaded project, but the next serious upgrade would be a calendar-style periodization view, charts, and optional cloud sync/auth if you want it to become a real account-based product.
+## Self-review
+
+This is a stronger commit than v4.0 because it improves real daily use, not only visuals or static content. The app is still simple and offline-first, but now the user can actually run the meal plan, track meal completion, restore data, see version/update state, and get warnings when the cut or training stress starts becoming risky.
+
+I deliberately did not add a backend, login system, AI chat, cloud sync, payments, or complex nutrition database. Those would slow the app down and create new failure points. The best version right now is still a fast static PWA.
