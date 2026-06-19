@@ -1,35 +1,47 @@
-const CACHE_NAME = "breakthrough-v3";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192_2.png", "./icon-512_2.png"];
+const CACHE_NAME = "breakthrough-athlete-os-v3";
+const CORE_ASSETS = [
+  "./",
+  "./index.html",
+  "./styles.css",
+  "./app.js",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png"
+];
 
-self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(CORE_ASSETS))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-self.addEventListener("activate", (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-self.addEventListener("fetch", (e) => {
-  e.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(e.request).then((cachedResponse) => {
-        const fetchPromise = fetch(e.request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            cache.put(e.request, networkResponse.clone());
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      const network = fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
           }
-          return networkResponse;
-        }).catch(() => {});
-        
-        return cachedResponse || fetchPromise;
-      });
+          return response;
+        })
+        .catch(() => cached || caches.match("./index.html"));
+      return cached || network;
     })
   );
 });
